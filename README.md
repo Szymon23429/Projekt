@@ -1,4 +1,3 @@
-Program:Rezerwacja wizyt (np. fryzjer, lekarz)
+Program: Księga gości 
 
-Opis: Użytkownicy mogą rezerwować terminy wizyt w danym miejscu.
-skład: Szymon Frątczak 
+Opis:Formularz do wpisania gości którzy są zapisywani w bazie danych skład:Szymon Frątczak 
