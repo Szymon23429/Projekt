@@ -5,7 +5,6 @@ $host = 'localhost';
 $dbname = 'moja_baza_danych';  
 $username = 'root';  
 $password = '';  
-
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
@@ -61,6 +60,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dodaj_goscia'])) {
     ]);
 
     $_SESSION['success'] = 'Gość został dodany!';
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit();
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['usun_id'])) {
+    $usun_id = (int)$_POST['usun_id'];
+
+    $sql = "DELETE FROM goscie WHERE id = :id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([':id' => $usun_id]);
+
+    $_SESSION['success'] = 'Gość został usunięty.';
+    header("Location: " . $_SERVER['PHP_SELF']);
+    exit();
+}
+
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['usun_id'])) {
+    $usun_id = (int)$_POST['usun_id'];
+
+    $sql = "DELETE FROM goscie WHERE id = :id";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([':id' => $usun_id]);
+
+    $_SESSION['success'] = 'Gość został usunięty.';
     header("Location: " . $_SERVER['PHP_SELF']);
     exit();
 }
@@ -142,6 +164,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['dodaj_goscia'])) {
                     <?php else: ?>
                         <button class="reserved-btn" disabled>Wizyta zarezerwowana</button>
                     <?php endif; ?>
+                    <td>
+    <?php if (!$gosc['rezerwacja']): ?>
+        <form method="POST" style="display:inline-block;">
+            <input type="hidden" name="rezerwuj_id" value="<?php echo $gosc['id']; ?>">
+            <label for="data_rezerwacji_<?php echo $gosc['id']; ?>">Data rezerwacji:</label>
+            <input type="datetime-local" name="data_rezerwacji" id="data_rezerwacji_<?php echo $gosc['id']; ?>" required>
+            <button type="submit" class="reserve-btn">Zarezerwuj wizytę</button>
+        </form>
+    <?php else: ?>
+        <button class="reserved-btn" disabled>Wizyta zarezerwowana</button>
+    <?php endif; ?>
+    <form method="POST" style="display:inline-block;" onsubmit="return confirm('Czy na pewno chcesz usunąć tego gościa?');">
+        <input type="hidden" name="usun_id" value="<?php echo $gosc['id']; ?>">
+        <button type="submit" class="delete-btn">Usuń</button>
+    </form>
+</td>
                 </td>
             </tr>
         <?php endforeach; ?>
