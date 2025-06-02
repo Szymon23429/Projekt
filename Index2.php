@@ -122,12 +122,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['usun_id'])) {
             SprawdzPoleRezerwacji();
             document.querySelector('input[name="rezerwacja"]').addEventListener('change', SprawdzPoleRezerwacji);
         };
+        document.getElementById('searchInput').addEventListener('input', function() {
+    const filter = this.value.toLowerCase();
+    const rows = document.querySelectorAll('.guest-table tbody tr');
+    rows.forEach(row => {
+        const imie = row.cells[0].textContent.toLowerCase();
+        const nazwisko = row.cells[1].textContent.toLowerCase();
+        if (imie.includes(filter) || nazwisko.includes(filter)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+function ustawMinimalnaDate() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = (now.getMonth() + 1).toString().padStart(2, '0');
+    const day = now.getDate().toString().padStart(2, '0');
+    const hours = now.getHours().toString().padStart(2, '0');
+    const minutes = now.getMinutes().toString().padStart(2, '0');
+    const minDate = `${year}-${month}-${day}T${hours}:${minutes}`;
+
+    document.querySelectorAll('input[type="datetime-local"]').forEach(input => {
+        input.min = minDate;
+    });
+}
+
+window.addEventListener('load', ustawMinimalnaDate);
+document.querySelectorAll('form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+        if (form.querySelector('input[name="rezerwuj_id"]')) { 
+            const dateInput = form.querySelector('input[name="data_rezerwacji"]');
+            if (dateInput && dateInput.value) {
+                if (!confirm(`Czy na pewno chcesz zarezerwować wizytę na ${dateInput.value.replace('T', ' ')}?`)) {
+                    e.preventDefault();
+                }
+            }
+        }
+    });
+});
+
     </script>
 </head>
 <body>
 <div class="container">
     <h1>Lista Gości</h1>
-
     <?php if (isset($_SESSION['success'])): ?>
         <p class="message success"><?php echo $_SESSION['success']; unset($_SESSION['success']); ?></p>
     <?php endif; ?>
@@ -135,56 +175,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['usun_id'])) {
     <?php if (isset($_SESSION['error'])): ?>
         <p class="message error"><?php echo $_SESSION['error']; unset($_SESSION['error']); ?></p>
     <?php endif; ?>
-
+<label for="searchInput">Szukaj gościa:</label>
+<input type="text" id="searchInput" placeholder="Wpisz imię lub nazwisko...">
     <table class="guest-table">
-        <thead>
-        <tr>
-            <th>Imię</th>
-            <th>Nazwisko</th>
-            <th>Rezerwacja</th>
-            <th>Akcja</th>
+    <thead>
+    <tr>
+        <th>Imię</th>
+        <th>Nazwisko</th>
+        <th>Rezerwacja</th>
+        <th>Rezerwuj</th>
+        <th>Usuń</th>
+    </tr>
+    </thead>
+    <tbody>
+    <?php foreach ($goscie as $gosc): ?>
+        <tr class="<?php echo $gosc['rezerwacja'] ? 'reserved' : ''; ?>">
+            <td><?php echo htmlspecialchars($gosc['imie']); ?></td>
+            <td><?php echo htmlspecialchars($gosc['nazwisko']); ?></td>
+            <td>
+                <?php echo $gosc['rezerwacja'] ? date('d-m-Y H:i', strtotime($gosc['data_rezerwacji'])) : 'Brak rezerwacji'; ?>
+            </td>
+            <td>
+                <?php if (!$gosc['rezerwacja']): ?>
+                    <form method="POST" style="display:flex; flex-direction: column; gap: 5px;">
+                        <input type="hidden" name="rezerwuj_id" value="<?php echo $gosc['id']; ?>">
+                        <label for="data_rezerwacji_<?php echo $gosc['id']; ?>">Data rezerwacji:</label>
+                        <input type="datetime-local" name="data_rezerwacji" id="data_rezerwacji_<?php echo $gosc['id']; ?>" required>
+                        <button type="submit" class="reserve-btn">Zarezerwuj wizytę</button>
+                    </form>
+                <?php else: ?>
+                    <button class="reserved-btn" disabled>Wizyta zarezerwowana</button>
+                <?php endif; ?>
+            </td>
+            <td>
+                <form method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć tego gościa?');">
+                    <input type="hidden" name="usun_id" value="<?php echo $gosc['id']; ?>">
+                    <button type="submit" class="delete-btn">Usuń</button>
+                </form>
+            </td>
         </tr>
-        </thead>
-        <tbody>
-        <?php foreach ($goscie as $gosc): ?>
-            <tr class="<?php echo $gosc['rezerwacja'] ? 'reserved' : ''; ?>">
-                <td><?php echo htmlspecialchars($gosc['imie']); ?></td>
-                <td><?php echo htmlspecialchars($gosc['nazwisko']); ?></td>
-                <td>
-                    <?php echo $gosc['rezerwacja'] ? date('d-m-Y H:i', strtotime($gosc['data_rezerwacji'])) : 'Brak rezerwacji'; ?>
-                </td>
-                <td>
-                    <?php if (!$gosc['rezerwacja']): ?>
-                        <form method="POST">
-                            <input type="hidden" name="rezerwuj_id" value="<?php echo $gosc['id']; ?>">
-                            <label for="data_rezerwacji_<?php echo $gosc['id']; ?>">Data rezerwacji:</label>
-                            <input type="datetime-local" name="data_rezerwacji" id="data_rezerwacji_<?php echo $gosc['id']; ?>" required>
-                            <button type="submit" class="reserve-btn">Zarezerwuj wizytę</button>
-                        </form>
-                    <?php else: ?>
-                        <button class="reserved-btn" disabled>Wizyta zarezerwowana</button>
-                    <?php endif; ?>
-                    <td>
-    <?php if (!$gosc['rezerwacja']): ?>
-        <form method="POST" style="display:inline-block;">
-            <input type="hidden" name="rezerwuj_id" value="<?php echo $gosc['id']; ?>">
-            <label for="data_rezerwacji_<?php echo $gosc['id']; ?>">Data rezerwacji:</label>
-            <input type="datetime-local" name="data_rezerwacji" id="data_rezerwacji_<?php echo $gosc['id']; ?>" required>
-            <button type="submit" class="reserve-btn">Zarezerwuj wizytę</button>
-        </form>
-    <?php else: ?>
-        <button class="reserved-btn" disabled>Wizyta zarezerwowana</button>
-    <?php endif; ?>
-    <form method="POST" style="display:inline-block;" onsubmit="return confirm('Czy na pewno chcesz usunąć tego gościa?');">
-        <input type="hidden" name="usun_id" value="<?php echo $gosc['id']; ?>">
-        <button type="submit" class="delete-btn">Usuń</button>
-    </form>
-</td>
-                </td>
-            </tr>
-        <?php endforeach; ?>
-        </tbody>
-    </table>
+    <?php endforeach; ?>
+    </tbody>
+</table>
+<div id="summary" style="margin-bottom: 20px; font-weight: bold;"></div>
 
     <h2>Dodaj Nowego Gościa</h2>
     <form method="POST" onsubmit="return FormularzRezerwacji()">
@@ -204,5 +237,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['usun_id'])) {
         <button type="submit" name="dodaj_goscia">Dodaj Gościa</button>
     </form>
 </div>
+
+<script>
+    function updateSummary() {
+  const rows = document.querySelectorAll('.guest-table tbody tr');
+  let totalGuests = 0;
+  let reservedGuests = 0;
+
+  rows.forEach(row => {
+    if (row.style.display !== 'none') {
+      totalGuests++;
+      if (row.classList.contains('reserved')) {
+        reservedGuests++;
+      }
+    }
+  });
+
+  const nonReservedGuests = totalGuests - reservedGuests;
+  document.getElementById('summary').innerHTML =
+    `Liczba gości: ${totalGuests} | ` +
+    `Z rezerwacją: ${reservedGuests} | ` +
+    `Bez rezerwacji: ${nonReservedGuests}`;
+}
+updateSummary();
+document.getElementById('searchInput').addEventListener('input', function() {
+    const filter = this.value.toLowerCase();
+    const rows = document.querySelectorAll('.guest-table tbody tr');
+
+    rows.forEach(row => {
+        const imie = row.cells[0].textContent.toLowerCase();
+        const nazwisko = row.cells[1].textContent.toLowerCase();
+
+        if (imie.includes(filter) || nazwisko.includes(filter)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+});
+</script>
 </body>
 </html>
