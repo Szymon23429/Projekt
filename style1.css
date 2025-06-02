@@ -5,30 +5,35 @@
 }
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f4f4;  
-    color: #333;  
+    background-color: #f4f4f4;
+    color: #333;
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     min-height: 100vh;
-    margin: 0;
+    padding: 40px 20px;
 }
 .container {
     width: 100%;
     max-width: 1200px;
     padding: 40px;
-    background-color: #fff;  
+    background-color: #fff;
     border-radius: 8px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    margin: 20px;
+}
+h1, h2 {
+    text-align: center;
+    color: #000;
+    margin-bottom: 20px;
 }
 
-
 h1 {
-    text-align: center;
-    color: #000;  
     font-size: 36px;
-    margin-bottom: 20px;
+}
+
+h2 {
+    font-size: 28px;
+    margin-top: 40px;
 }
 .guest-table {
     width: 100%;
@@ -39,45 +44,33 @@ h1 {
 .guest-table th, .guest-table td {
     padding: 16px 20px;
     text-align: left;
-    border-bottom: 1px solid #ddd;  
+    border-bottom: 1px solid #ddd;
     font-size: 18px;
 }
 
 .guest-table th {
-    background-color: #333;  
+    background-color: #333;
     color: white;
     text-transform: uppercase;
     font-weight: bold;
     letter-spacing: 1px;
 }
-.reserve-btn {
-    background-color: #4CAF50;
-    color: white;
-    padding: 5px 10px;
-}
-
-.reserved-btn {
-    background-color: #aaa;
-    color: white;
-    padding: 5px 10px;
-}
-
-.delete-btn {
-    background-color: #e74c3c;
-    color: white;
-    padding: 5px 10px;
-    margin-left: 10px;
-}
 
 .guest-table td {
-    background-color: #fff;  
+    background-color: #fff;
     color: #333;
 }
+
 .guest-table tr:hover {
-    background-color: #f1f1f1;  
+    background-color: #f1f1f1;
     transition: background-color 0.3s;
 }
-.reserve-btn, .reserved-btn {
+
+.reserved {
+    background-color: #e0e0e0;
+    color: #777;
+}
+.reserve-btn, .reserved-btn, .delete-btn {
     padding: 10px 20px;
     font-size: 16px;
     border-radius: 5px;
@@ -89,13 +82,13 @@ h1 {
 }
 
 .reserve-btn {
-    background-color: #000; 
+    background-color: #000;
     color: white;
     font-weight: bold;
 }
 
 .reserve-btn:hover {
-    background-color: #444;  
+    background-color: #444;
     transform: translateY(-3px);
 }
 
@@ -104,22 +97,34 @@ h1 {
 }
 
 .reserved-btn {
-    background-color: #ccc;  
+    background-color: #ccc;
     cursor: not-allowed;
+    color: white;
 }
 
 .reserved-btn:hover {
-    background-color: #aaa;  
+    background-color: #aaa;
 }
-.reserved {
-    background-color: #e0e0e0;
-    color: #777;
+
+.delete-btn {
+    background-color: #e74c3c;
+    color: white;
+    margin-left: 10px;
+}
+
+.delete-btn:hover {
+    background-color: #c0392b;
+    transform: translateY(-3px);
+}
+
+.delete-btn:active {
+    transform: translateY(1px);
 }
 form {
-    background-color: #fff;  
+    background-color: #fff;
     padding: 20px;
     border-radius: 8px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
     margin-top: 40px;
 }
 
@@ -130,28 +135,28 @@ form label {
     color: #333;
 }
 
-form input[type="text"], form input[type="datetime-local"] {
+form input[type="text"],
+form input[type="datetime-local"] {
     width: 100%;
     padding: 12px;
     margin-bottom: 15px;
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 16px;
-    color: #333;
     background-color: #f9f9f9;
     transition: border 0.3s ease-in-out;
 }
 
-form input[type="text"]:focus, form input[type="datetime-local"]:focus {
-    border-color: #333;
+form input:focus {
+    border-color: #000;
     background-color: #fff;
 }
 
-form button {
-    padding: 12px 20px;
-    font-size: 16px;
+form button[type="submit"] {
     background-color: #000;
     color: #fff;
+    font-size: 16px;
+    padding: 12px 20px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
@@ -166,18 +171,38 @@ form button:hover {
 form button:active {
     transform: translateY(1px);
 }
+.message {
+    padding: 15px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.success {
+    background-color: #dff0d8;
+    color: #3c763d;
+    border: 1px solid #3c763d;
+}
+
+.error {
+    background-color: #f2dede;
+    color: #a94442;
+    border: 1px solid #a94442;
+}
 @media (max-width: 768px) {
     .container {
         padding: 20px;
     }
 
+    h1 {
+        font-size: 28px;
+    }
+
     .guest-table th, .guest-table td {
         padding: 12px 16px;
         font-size: 16px;
-    }
-
-    h1 {
-        font-size: 28px;
     }
 
     form input[type="text"], form input[type="datetime-local"] {
@@ -200,3 +225,64 @@ form button:active {
         font-size: 14px;
     }
 }
+input[type="checkbox"] {
+    transform: scale(1.2);
+    margin-right: 8px;
+    cursor: pointer;
+}
+.guest-table form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.guest-table label {
+    font-weight: normal;
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.guest-table input[type="datetime-local"] {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+}
+h2 {
+    font-size: 24px;
+    margin-top: 60px;
+    text-align: center;
+    color: #111;
+}
+.message {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 500;
+    text-align: center;
+    width: 100%;
+}
+
+.message.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+@media (max-width: 768px) {
+    .guest-table form {
+        flex-direction: column;
+    }
+
+    .guest-table input[type="datetime-local"] {
+        font-size: 14px;
+    }
+}
+
